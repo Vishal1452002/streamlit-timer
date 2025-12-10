@@ -157,12 +157,11 @@ with st.container():
     button_label = "Stop" if st.session_state.running else "Start"
     
     # Use a single button with a conditional callback
-    if st.button(button_label, use_container_width=True):
-        if st.session_state.running:
-            stop_stopwatch()
-        else:
-            start_stopwatch()
-            
+  if st.button(button_label, use_container_width=True):
+    if st.session_state.running:
+        stop_stopwatch() # Single tap stops it
+    else:
+        start_stopwatch() # Single tap starts it
     # -------------------------------------
     # RESET Button
     # -------------------------------------
@@ -174,4 +173,5 @@ with st.container():
 # Note: The separate columns layout (col1, col2, col3) is usually for positioning. 
 # Here, we use a single st.container() and apply the custom CSS to the inner HTML div 
 # to manage the flexible layout, which is more robust for switching between row/column.
+
 
