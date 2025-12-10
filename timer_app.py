@@ -2,117 +2,116 @@ import streamlit as st
 import time
 
 # ---------------------------
-# Initialize Session State
+# Session State Initialization
 # ---------------------------
-if "seconds" not in st.session_state:
-    st.session_state.seconds = 0
+if "start_time" not in st.session_state:
+    st.session_state.start_time = None
 
 if "running" not in st.session_state:
     st.session_state.running = False
 
-if "paused" not in st.session_state:
-    st.session_state.paused = False
-
-if "laps" not in st.session_state:
-    st.session_state.laps = []
+if "elapsed" not in st.session_state:
+    st.session_state.elapsed = 0.0
 
 
 # ---------------------------
-# Timer Logic
+# Stopwatch Logic
 # ---------------------------
-def start_timer():
-    st.session_state.running = True
-    st.session_state.paused = False
+def start():
+    if not st.session_state.running:
+        st.session_state.start_time = time.time() - st.session_state.elapsed
+        st.session_state.running = True
 
-def pause_timer():
-    st.session_state.paused = True
+def stop():
+    if st.session_state.running:
+        st.session_state.elapsed = time.time() - st.session_state.start_time
+        st.session_state.running = False
 
-def reset_timer():
-    st.session_state.seconds = 0
-    st.session_state.paused = True
+def reset():
+    st.session_state.start_time = None
+    st.session_state.elapsed = 0.0
     st.session_state.running = False
-    st.session_state.laps = []
-
-def add_lap():
-    st.session_state.laps.append(st.session_state.seconds)
 
 
 # ---------------------------
-# Auto-refresh every second when running
+# Millisecond Timer Calculation
 # ---------------------------
-if st.session_state.running and not st.session_state.paused:
-    st_autorefresh = st.experimental_rerun
-    st.experimental_rerun  # legacy support
+if st.session_state.running:
+    st.session_state.elapsed = time.time() - st.session_state.start_time
 
 
 # ---------------------------
-# Custom CSS for Mobile UI
+# Format Time (HH:MM:SS.ms)
 # ---------------------------
-st.markdown(
-    """
-    <style>
-        .center-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+total_ms = int(st.session_state.elapsed * 100)
+ms = total_ms % 100
+total_seconds = int(st.session_state.elapsed)
+seconds = total_seconds % 60
+minutes = (total_seconds // 60) % 60
+hours = total_seconds // 3600
+
+formatted = f"{hours:02d}:{minutes:02d}:{seconds:02d}.{ms:01d}"
+
+
+# ---------------------------
+# UI Styling (LOOKS LIKE YOUR IMAGE)
+# ---------------------------
+st.markdown("""
+<style>
+    .timer-box {
+        font-size: 80px;
+        font-weight: bold;
+        text-align: center;
+        color: white;
+        padding: 20px;
+        background-color: #333;
+        border-radius: 10px;
+        margin-top: 30px;
+    }
+    .btn-row {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+    @media (max-width: 600px) {
         .timer-box {
-            text-align: center;
-            font-size: 40px;
-            font-weight: bold;
-            margin-top: 20px;
+            font-size: 55px;
         }
-        @media (max-width: 600px) {
-            .timer-box {
-                font-size: 32px;
-            }
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+    }
+</style>
+""", unsafe_allow_html=True)
 
 
 # ---------------------------
-# UI
+# TITLE + DISPLAY
 # ---------------------------
-st.title("⏱️ Mobile-Friendly Timer")
+st.title("⏱️ Stopwatch")
 
-# Timer display
-st.markdown(f"<div class='timer-box'>Time: {st.session_state.seconds} sec</div>", unsafe_allow_html=True)
+st.markdown(f"<div class='timer-box'>{formatted}</div>", unsafe_allow_html=True)
 
-# Button row
-st.markdown("<div class='center-buttons'>", unsafe_allow_html=True)
+
+# ---------------------------
+# BUTTONS
+# ---------------------------
+st.markdown("<div class='btn-row'>", unsafe_allow_html=True)
 
 if st.button("Start"):
-    start_timer()
+    start()
 
-if st.button("Pause"):
-    pause_timer()
+if st.button("Stop"):
+    stop()
 
 if st.button("Reset"):
-    reset_timer()
-
-if st.button("Lap"):
-    add_lap()
+    reset()
 
 st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ---------------------------
-# Lap Display
+# Auto-refresh for smooth milliseconds
 # ---------------------------
-if st.session_state.laps:
-    st.subheader("Lap Times")
-    for i, lap in enumerate(st.session_state.laps, 1):
-        st.write(f"Lap {i}: {lap} sec")
-
-
-# ---------------------------
-# Safer Timer Increment Logic
-# ---------------------------
-if st.session_state.running and not st.session_state.paused:
-    st.session_state.seconds += 1
-    time.sleep(1)
+if st.session_state.running:
+    time.sleep(0.1)  # refresh every 100ms for smooth display
     st.experimental_rerun()
