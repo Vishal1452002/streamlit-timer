@@ -13,6 +13,9 @@ if "running" not in st.session_state:
 if "paused" not in st.session_state:
     st.session_state.paused = False
 
+if "laps" not in st.session_state:
+    st.session_state.laps = []
+
 
 # ---------------------------
 # Timer Logic
@@ -25,47 +28,83 @@ def pause_timer():
     st.session_state.paused = True
 
 def reset_timer():
-    
     st.session_state.seconds = 0
     st.session_state.paused = True
     st.session_state.running = False
+    st.session_state.laps = []
+
+def add_lap():
+    st.session_state.laps.append(st.session_state.seconds)
+
+
+# ---------------------------
+# Custom CSS for Mobile Centering
+# ---------------------------
+st.markdown(
+    """
+    <style>
+        .center-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .timer-box {
+            text-align: center;
+            font-size: 40px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        @media (max-width: 600px) {
+            .timer-box {
+                font-size: 32px;
+            }
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 
 # ---------------------------
 # UI
 # ---------------------------
-st.title("⏱️ Streamlit Timer")
+st.title("⏱️ Mobile-Friendly Timer")
 
-col1, col2, col3 = st.columns(3)
+# Centered timer display
+st.markdown(f"<div class='timer-box'>Time: {st.session_state.seconds} sec</div>", unsafe_allow_html=True)
 
-with col1:
-    if st.button("Start"):
-        start_timer()
+# Centered buttons row
+st.markdown("<div class='center-buttons'>", unsafe_allow_html=True)
 
-with col2:
-    if st.button("Pause"):
-        pause_timer()
+if st.button("Start"):
+    start_timer()
 
-with col3:
-    if st.button("Reset"):
-        reset_timer()
+if st.button("Pause"):
+    pause_timer()
 
-# Display timer output placeholder
-timer_display = st.empty()
+if st.button("Reset"):
+    reset_timer()
+
+if st.button("Lap"):
+    add_lap()
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ---------------------------
-# Update Timer
+# Lap Display
+# ---------------------------
+if st.session_state.laps:
+    st.subheader("Lap Times")
+    for i, lap in enumerate(st.session_state.laps, 1):
+        st.write(f"Lap {i}: {lap} sec")
+
+
+# ---------------------------
+# Timer Updater
 # ---------------------------
 if st.session_state.running and not st.session_state.paused:
-    # Run one tick
     st.session_state.seconds += 1
-    timer_display.markdown(f"### Time: **{st.session_state.seconds} sec**")
-
-    # Sleep 1 sec then rerun automatically
     time.sleep(1)
-    st.rerun()
-
-else:
-    # Static display
-    timer_display.markdown(f"### Time: **{st.session_state.seconds} sec**")
+    st.experimental_rerun()
