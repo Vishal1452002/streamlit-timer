@@ -1,16 +1,13 @@
 import time
 import streamlit as st
-# Import the autorefresh component
 from streamlit_autorefresh import st_autorefresh
 
 # --- Configuration and Initialization ---
-# Set the page configuration for better mobile appearance
 st.set_page_config(layout="centered", page_title="Streamlit Stopwatch")
 
 # -------------------------------------
 # 1. Initialize session state
 # -------------------------------------
-# Initialize state variables if they don't exist
 if "start_time" not in st.session_state:
     st.session_state.start_time = None
 if "elapsed" not in st.session_state:
@@ -25,14 +22,12 @@ if "running" not in st.session_state:
 def start_stopwatch():
     """Starts the stopwatch or resumes from a paused state."""
     if not st.session_state.running:
-        # Calculate start_time by subtracting elapsed time from current time
         st.session_state.start_time = time.time() - st.session_state.elapsed
         st.session_state.running = True
 
 def stop_stopwatch():
     """Stops the stopwatch and saves the elapsed time."""
     if st.session_state.running:
-        # Save the current elapsed time before stopping
         st.session_state.elapsed = time.time() - st.session_state.start_time
         st.session_state.running = False
 
@@ -46,16 +41,14 @@ def reset_stopwatch():
 # -------------------------------------
 # 3. Auto-refresh when running
 # -------------------------------------
-# Only run the autorefresh component if the stopwatch is currently running.
-# The interval of 100ms (1/10th of a second) provides a smooth update for the tenths digit.
 if st.session_state.running:
+    # Refresh every 100ms
     st_autorefresh(interval=100, key="refresh_timer")
 
 
 # -------------------------------------
 # 4. Update elapsed time
 # -------------------------------------
-# This must run on every rerun *before* formatting the time.
 if st.session_state.running and st.session_state.start_time is not None:
     st.session_state.elapsed = time.time() - st.session_state.start_time
 
@@ -71,14 +64,12 @@ seconds = total_seconds % 60
 minutes = (total_seconds // 60) % 60
 hours = total_seconds // 3600
 
+# Using a consistent variable name
 formatted_time = f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths}"
 
 
 # -------------------------------------
-# 6. CSS Styling (Updated for Column Layout on Mobile)
-# -------------------------------------
-# -------------------------------------
-# CSS Styling (Updated with nowrap)
+# 6. CSS Styling (Includes 'white-space: nowrap;' for the fix)
 # -------------------------------------
 st.markdown("""
 <style>
@@ -94,13 +85,11 @@ st.markdown("""
     border-radius: 12px;
     margin-top: 30px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    
-    /* === ADD THIS LINE TO PREVENT LINE BREAKS === */
+    /* PREVENTS THE TIME FROM WRAPPING ONTO A NEW LINE */
     white-space: nowrap; 
-    /* =========================================== */
 }
 
-/* Container for the buttons */
+/* Container for the buttons (Default is a row) */
 .button-row {
     display: flex;
     justify-content: center;
@@ -135,33 +124,27 @@ st.markdown("""
 # -------------------------------------
 # 7. Layout and UI
 # -------------------------------------
-st.title("⏱️ Simple Streamlit Stopwatch")
+st.title("⏱️ Streamlit Stopwatch")
 
 # Display the formatted time using the styled div
 st.markdown(f"<div class='timer-box'>{formatted_time}</div>", unsafe_allow_html=True)
 
 
-# Use Streamlit columns to create the button layout.
-# This is the idiomatic Streamlit way to group elements.
-# The custom CSS with `flex-direction: column` for mobile will handle the responsiveness.
-col1, col2, col3 = st.columns(3)
-
-# Use st.button() with the 'button-row' class to trigger the custom CSS
+# Button Layout
 with st.container():
     st.markdown('<div class="button-row">', unsafe_allow_html=True)
     
     # -------------------------------------
     # START/PAUSE Button
     # -------------------------------------
-    # Use different labels based on state for better UX
     button_label = "Stop" if st.session_state.running else "Start"
     
-    # Use a single button with a conditional callback
-  if st.button(button_label, use_container_width=True):
-    if st.session_state.running:
-        stop_stopwatch() # Single tap stops it
-    else:
-        start_stopwatch() # Single tap starts it
+    if st.button(button_label, use_container_width=True):
+        if st.session_state.running:
+            stop_stopwatch()
+        else:
+            start_stopwatch()
+            
     # -------------------------------------
     # RESET Button
     # -------------------------------------
@@ -169,9 +152,3 @@ with st.container():
         reset_stopwatch()
         
     st.markdown('</div>', unsafe_allow_html=True)
-
-# Note: The separate columns layout (col1, col2, col3) is usually for positioning. 
-# Here, we use a single st.container() and apply the custom CSS to the inner HTML div 
-# to manage the flexible layout, which is more robust for switching between row/column.
-
-
