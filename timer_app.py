@@ -17,22 +17,19 @@ if "running" not in st.session_state:
 
 
 # -------------------------------------
-# 2. Stopwatch control functions (using Streamlit's callback system)
+# 2. Stopwatch control functions
 # -------------------------------------
 def start_stopwatch():
-    """Starts the stopwatch or resumes from a paused state."""
     if not st.session_state.running:
         st.session_state.start_time = time.time() - st.session_state.elapsed
         st.session_state.running = True
 
 def stop_stopwatch():
-    """Stops the stopwatch and saves the elapsed time."""
     if st.session_state.running:
         st.session_state.elapsed = time.time() - st.session_state.start_time
         st.session_state.running = False
 
 def reset_stopwatch():
-    """Resets the stopwatch to zero."""
     st.session_state.running = False
     st.session_state.elapsed = 0.0
     st.session_state.start_time = None
@@ -41,8 +38,8 @@ def reset_stopwatch():
 # -------------------------------------
 # 3. Auto-refresh when running
 # -------------------------------------
+# Only run the autorefresh if needed
 if st.session_state.running:
-    # Refresh every 100ms
     st_autorefresh(interval=100, key="refresh_timer")
 
 
@@ -64,15 +61,19 @@ seconds = total_seconds % 60
 minutes = (total_seconds // 60) % 60
 hours = total_seconds // 3600
 
-# Using a consistent variable name
 formatted_time = f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths}"
 
 
 # -------------------------------------
-# 6. CSS Styling (Includes 'white-space: nowrap;' for the fix)
+# 6. CSS Styling
 # -------------------------------------
 st.markdown("""
 <style>
+/* Global style to reduce margin/padding which can sometimes cause jitter */
+[data-testid="stVerticalBlock"] {
+    gap: 0rem;
+}
+
 /* Style for the main timer display */
 .timer-box {
     font-family: monospace;
@@ -85,7 +86,6 @@ st.markdown("""
     border-radius: 12px;
     margin-top: 30px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    /* PREVENTS THE TIME FROM WRAPPING ONTO A NEW LINE */
     white-space: nowrap; 
 }
 
@@ -105,14 +105,12 @@ st.markdown("""
         padding: 20px;
     }
     
-    /* Change the button layout from row to column on small screens */
     .button-row {
         flex-direction: column; 
         gap: 15px; 
         width: 100%;
     }
     
-    /* Ensure Streamlit buttons in the column take full width */
     .stButton>button {
         width: 100%;
     }
@@ -126,17 +124,21 @@ st.markdown("""
 # -------------------------------------
 st.title("⏱️ Streamlit Stopwatch")
 
-# Display the formatted time using the styled div
-st.markdown(f"<div class='timer-box'>{formatted_time}</div>", unsafe_allow_html=True)
+# *** FIX FOR FLICKERING: Create a placeholder for the timer ***
+# This placeholder will be updated with the time, preventing the 
+# entire app from redrawing that section every 100ms.
+timer_placeholder = st.empty()
 
 
-# Button Layout
+# Display the formatted time using the styled div inside the placeholder
+timer_placeholder.markdown(f"<div class='timer-box'>{formatted_time}</div>", unsafe_allow_html=True)
+
+
+# Button Layout (No changes needed here)
 with st.container():
     st.markdown('<div class="button-row">', unsafe_allow_html=True)
     
-    # -------------------------------------
     # START/PAUSE Button
-    # -------------------------------------
     button_label = "Stop" if st.session_state.running else "Start"
     
     if st.button(button_label, use_container_width=True):
@@ -145,9 +147,7 @@ with st.container():
         else:
             start_stopwatch()
             
-    # -------------------------------------
     # RESET Button
-    # -------------------------------------
     if st.button("Reset", use_container_width=True):
         reset_stopwatch()
         
