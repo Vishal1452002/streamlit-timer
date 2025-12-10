@@ -38,7 +38,15 @@ def add_lap():
 
 
 # ---------------------------
-# Custom CSS for Mobile Centering
+# Auto-refresh every second when running
+# ---------------------------
+if st.session_state.running and not st.session_state.paused:
+    st_autorefresh = st.experimental_rerun
+    st.experimental_rerun  # legacy support
+
+
+# ---------------------------
+# Custom CSS for Mobile UI
 # ---------------------------
 st.markdown(
     """
@@ -71,10 +79,10 @@ st.markdown(
 # ---------------------------
 st.title("⏱️ Mobile-Friendly Timer")
 
-# Centered timer display
+# Timer display
 st.markdown(f"<div class='timer-box'>Time: {st.session_state.seconds} sec</div>", unsafe_allow_html=True)
 
-# Centered buttons row
+# Button row
 st.markdown("<div class='center-buttons'>", unsafe_allow_html=True)
 
 if st.button("Start"):
@@ -102,7 +110,7 @@ if st.session_state.laps:
 
 
 # ---------------------------
-# Timer Updater
+# Safer Timer Increment Logic
 # ---------------------------
 if st.session_state.running and not st.session_state.paused:
     st.session_state.seconds += 1
