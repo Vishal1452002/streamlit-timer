@@ -110,9 +110,9 @@ st.markdown("""
 */
 
 /* --- Mobile Specific Styles (Break into a Column) --- */
-@media (max-width: 500px) {
+@media (max-width: 400px) {
     .timer-box { 
-        font-size: 55px; /* Smaller font on mobile */
+        font-size: 45px; /* Smaller font on mobile */
         padding: 20px;
     }
     
@@ -174,4 +174,5 @@ with st.container():
 # Note: The separate columns layout (col1, col2, col3) is usually for positioning. 
 # Here, we use a single st.container() and apply the custom CSS to the inner HTML div 
 # to manage the flexible layout, which is more robust for switching between row/column.
+
 
