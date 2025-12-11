@@ -75,55 +75,58 @@ formatted_time = f"{hours:02d}:{minutes:02d}:{seconds:02d}.{tenths}"
 
 
 # -------------------------------------
-# 6. CSS Styling (Adjusted Font Size and Mobile Width)
+# 6. CSS Styling (Updated for Column Layout on Mobile)
 # -------------------------------------
 st.markdown("""
 <style>
 /* Style for the main timer display */
 .timer-box {
-    font-family: monospace;
-    font-size: 120px; /* INCREASED SIZE for better visibility */
-    font-weight: bold;
-    color: #00ff00;
-    background-color: #222;
-    text-align: center;
-    padding: 30px;
-    border-radius: 12px;
-    margin-top: 30px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    font-family: monospace; /* Monospace font makes the display stable */
+    font-size: 80px;
+    font-weight: bold;
+    color: #00ff00; /* Neon green for a tech/stopwatch feel */
+    background-color: #222;
+    text-align: center;
+    padding: 30px;
+    border-radius: 12px;
+    margin-top: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 /* Container for the buttons (Default is a row) */
 .button-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Reduced gap for better fit */
+    margin-top: 30px;
 }
 
+/* Custom styling for Streamlit buttons */
+/* Targeting Streamlit's rendered button structure is complex, 
+   so we rely on the main button-row for layout and let Streamlit
+   handle the button rendering unless we use st.markdown forms. 
+   Since we switch to st.button(), we remove the custom button classes.
+*/
 
-/* --- Mobile Specific Styles --- */
+/* --- Mobile Specific Styles (Break into a Column) --- */
 @media (max-width: 600px) {
-    .timer-box { 
-        font-size: 80px; /* Increased mobile size from 55px to 80px */
-        padding: 20px;
-        max-width: 90%; 
-        margin-left: auto;
-        margin-right: auto;
-    }
-    
-    /* Change the button layout from row to column on small screens */
-    .button-row {
-        flex-direction: column;
-        gap: 15px;
-        width: 100%;
-    }
-    
-    /* Ensure Streamlit buttons in the column take full width */
-    .stButton>button {
-        width: 100%;
-    }
+    .timer-box { 
+        font-size: 55px; /* Smaller font on mobile */
+        padding: 20px;
+    }
+    
+    /* Change the button layout from row to column on small screens */
+    .button-row {
+        flex-direction: column; /* FORCES COLUMN LAYOUT */
+        gap: 15px; /* Spacing between column elements */
+        width: 100%; /* Use full width in the center */
+    }
+    
+    /* Ensure Streamlit buttons in the column take full width */
+    .stButton>button {
+        width: 100%;
+    }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -171,6 +174,3 @@ with st.container():
 # Note: The separate columns layout (col1, col2, col3) is usually for positioning. 
 # Here, we use a single st.container() and apply the custom CSS to the inner HTML div 
 # to manage the flexible layout, which is more robust for switching between row/column.
-
-
-
