@@ -1,2 +1,158 @@
-streamlit
-streamlit-autorefresh
+Streamlit Stopwatch Application - Technical Documentation
+=========================================================
+
+1. Overview
+-----------
+This application is a fully functional stopwatch built using Streamlit.
+It supports precise time tracking with Start, Stop, and Reset controls,
+auto-refresh updates, and responsive UI optimized for mobile screens.
+
+Key features:
+- Smooth timer updates using st_autorefresh
+- Accurate elapsed-time tracking using system time
+- Persistent state using Streamlit session_state
+- Custom CSS for a professional timer display
+- Responsive layout switching between row/column on mobile
+
+---------------------------------------------------------
+
+2. Session State Variables
+--------------------------
+start_time : Timestamp marking when the stopwatch started or resumed.
+elapsed    : Total elapsed time in seconds.
+running    : Boolean indicating whether the stopwatch is currently active.
+
+These values persist across Streamlit reruns, ensuring timer continuity.
+
+---------------------------------------------------------
+
+3. Stopwatch Logic
+------------------
+The stopwatch uses the current system time to compute elapsed time.
+
+Start:
+    start_time = current_time - elapsed
+    running = True
+
+Stop:
+    elapsed = current_time - start_time
+    running = False
+
+Reset:
+    start_time = None
+    elapsed = 0.0
+    running = False
+
+On every refresh:
+    if running:
+        elapsed = current_time - start_time
+
+This ensures accurate timing even after auto-refresh or re-renders.
+
+---------------------------------------------------------
+
+4. Auto-Refresh Mechanism
+--------------------------
+The st_autorefresh component triggers a page rerun at 100 ms intervals
+(10 times per second) while the stopwatch is running.
+
+Reason:
+- Ensures smooth tenths-of-a-second updates
+- Reduces CPU load compared to very high refresh frequencies
+
+---------------------------------------------------------
+
+5. Time Formatting (HH:MM:SS.t)
+-------------------------------
+After computing elapsed time:
+
+hours    = total_seconds // 3600
+minutes  = (total_seconds // 60) % 60
+seconds  = total_seconds % 60
+tenths   = int(elapsed * 10) % 10
+
+Formatted output:
+    HH:MM:SS.t
+
+Example:
+    00:12:45.3
+
+---------------------------------------------------------
+
+6. UI and Layout
+-----------------
+Main components:
+- Page title
+- Styled time display using HTML <div>
+- Start/Stop button (behavior changes dynamically)
+- Reset button
+
+Button layout:
+- A flexbox (.button-row) displays them in a row by default
+- On phone screens (< 600px), CSS forces column layout
+- Buttons stretch to 100% width on mobile
+
+---------------------------------------------------------
+
+7. Custom CSS Summary
+---------------------
+.timer-box:
+    - Monospace font for stable width
+    - Neon green color on dark background
+    - Large font size for visibility
+    - Box shadow and padding
+
+.button-row (desktop):
+    - Display: flex (row)
+    - Center alignment
+    - Spacing between buttons
+
+.button-row (mobile):
+    - flex-direction: column
+    - Full-width buttons
+
+This completely solves Streamlit’s default mobile stacking issues.
+
+---------------------------------------------------------
+
+8. Button Behavior
+------------------
+Start/Stop button:
+    - Shows "Start" when timer is stopped
+    - Shows "Stop" when running
+    - Clicking toggles state
+
+Reset button:
+    - Clears all session state values
+    - Timer returns to 00:00:00.0
+
+---------------------------------------------------------
+
+9. Internal Structure Summary
+-----------------------------
+1. Initialize session state
+2. Define callback functions for start/stop/reset
+3. Apply auto-refresh if running
+4. Update elapsed time
+5. Format display
+6. Apply CSS for styling and responsiveness
+7. Render UI and buttons
+
+---------------------------------------------------------
+
+10. Deployment Notes
+--------------------
+You can deploy this app to:
+
+- Streamlit Cloud
+- AWS EC2
+- Any Linux/Windows server that supports Streamlit
+
+Run locally:
+    streamlit run stopwatch.py
+
+---------------------------------------------------------
+
+End of Documentation
+=========================================================
+
