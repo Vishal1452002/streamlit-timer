@@ -82,12 +82,12 @@ st.markdown("""
 /* Style for the main timer display (NO CHANGE HERE) */
 .timer-box {
     font-family: monospace;
-    font-size: 80px;
+    font-size: 150px;
     font-weight: bold;
     color: #00ff00;
     background-color: #222;
     text-align: center;
-    padding: 30px;
+    padding: 600px;
     border-radius: 12px;
     margin-top: 30px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -175,4 +175,5 @@ with st.container():
 # Note: The separate columns layout (col1, col2, col3) is usually for positioning. 
 # Here, we use a single st.container() and apply the custom CSS to the inner HTML div 
 # to manage the flexible layout, which is more robust for switching between row/column.
+
 
